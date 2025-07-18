@@ -67,6 +67,7 @@ The action reads a few env variables:
 * `PRIVATE_KEY` can be a private key to sign the packages (apk) feed.
 * `NO_DEFAULT_FEEDS` disable adding the default SDK feeds
 * `NO_REFRESH_CHECK` disable check if patches need a refresh.
+* `GOPACKAGELATEST` use latest golang version.
 * `NO_SHFMT_CHECK` disable check if init files are formated
 * `PACKAGES` (Optional) specify the list of packages (space separated) to be built
 * `V` changes the build verbosity level.
