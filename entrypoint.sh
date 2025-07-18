@@ -72,7 +72,7 @@ if [ -z "$PACKAGES" ]; then
 	for FEED in $ALL_CUSTOM_FEEDS; do
 		group "feeds install -p $FEED -f -a"
 		./scripts/feeds install -p "$FEED" -f -a
-  		if [ -z "$GOPACKAGELATEST" ]; then
+  		if [[ "$GOPACKAGELATEST" =~ ^(true|yes|1)$ ]]; then
   			rm -rf feeds/packages/lang/golang
 			git clone https://github.com/kmoz000/packages_lang_golang -b 24.x feeds/packages/lang/golang
   		fi
@@ -96,7 +96,7 @@ else
 			./scripts/feeds install -p "$FEED" -f "$PKG"
 			endgroup
 		done
-		if [ -z "$GOPACKAGELATEST" ]; then
+		if [[ "$GOPACKAGELATEST" =~ ^(true|yes|1)$ ]]; then
   			rm -rf feeds/packages/lang/golang
 			git clone https://github.com/kmoz000/packages_lang_golang -b 24.x feeds/packages/lang/golang
   		fi
