@@ -49,15 +49,54 @@ fi
 echo "src-link $FEEDNAME /feed/" >> feeds.conf
 
 ALL_CUSTOM_FEEDS="$FEEDNAME "
+
+# Fix for EXTRA_FEEDS processing with proper path handling
 #shellcheck disable=SC2153
 for EXTRA_FEED in $EXTRA_FEEDS; do
-	echo "$EXTRA_FEED" | tr '|' ' ' >> feeds.conf
-	ALL_CUSTOM_FEEDS+="$(echo "$EXTRA_FEED" | cut -d'|' -f2) "
+	# Check if EXTRA_FEED contains pipe separator (new format)
+	if [[ "$EXTRA_FEED" == *"|"* ]]; then
+		# Extract components: src-type|feedname|path
+		FEED_TYPE=$(echo "$EXTRA_FEED" | cut -d'|' -f1)
+		FEED_NAME=$(echo "$EXTRA_FEED" | cut -d'|' -f2)
+		FEED_PATH=$(echo "$EXTRA_FEED" | cut -d'|' -f3)
+		
+		# Handle workspace path resolution
+		if [[ "$FEED_PATH" == *"/github/workspace/"* ]] || [[ "$FEED_PATH" == *"github.workspace"* ]]; then
+			# Convert GitHub workspace paths to container paths
+			# The main feed is mounted at /feed/, so any additional feed should be at /feed/../{feedname}
+			FEED_PATH="/feed/../${FEED_NAME}"
+		elif [[ "$FEED_PATH" == *"/workspace/"* ]] || [[ "$FEED_PATH" == *"workspace"* ]]; then
+			# Handle other workspace path variations
+			FEED_PATH="/feed/../${FEED_NAME}"
+		fi
+		
+		# Write the feed line to feeds.conf
+		echo "$FEED_TYPE $FEED_NAME $FEED_PATH" >> feeds.conf
+		ALL_CUSTOM_FEEDS+="$FEED_NAME "
+	else
+		# Legacy format - assume it's just a feed name
+		echo "src-link $EXTRA_FEED /feed/../$EXTRA_FEED" >> feeds.conf
+		ALL_CUSTOM_FEEDS+="$EXTRA_FEED "
+	fi
 done
 
 group "feeds.conf"
 cat feeds.conf
 endgroup
+
+# Verify that custom feed paths exist if specified
+for FEED in $ALL_CUSTOM_FEEDS; do
+	if [[ "$FEED" != "$FEEDNAME" ]]; then
+		FEED_DIR="/feed/../${FEED}"
+		if [ ! -d "$FEED_DIR" ]; then
+			echo "Warning: $FEED feed directory not found at $FEED_DIR"
+			echo "Available directories in /feed/../:"
+			ls -la /feed/../ || true
+		else
+			echo "✓ $FEED feed directory found at $FEED_DIR"
+		fi
+	fi
+done
 
 group "feeds update -a"
 ./scripts/feeds update -a
