@@ -55,6 +55,8 @@ The action reads a few env variables:
   Defaults to the default working directory (`GITHUB_WORKSPACE`).
 * `BUILD_LOG` stores build logs in `./logs`.
 * `CONTAINER` can set other SDK containers than `openwrt/sdk`.
+* `DOWNLOAD_MIRROR` specifies a custom download mirror for packages. Defaults to
+  `https://download.iopsys.eu/iopsys/mirror/`.
 * `EXTRA_FEEDS` are added to the `feeds.conf`, where `|` are replaced by white
   spaces.
 * `FEED_DIR` used in the created `feeds.conf` for the current repo. Defaults to
