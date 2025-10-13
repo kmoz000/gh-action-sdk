@@ -28,6 +28,11 @@ endgroup
 FEEDNAME="${FEEDNAME:-action}"
 BUILD_LOG="${BUILD_LOG:-1}"
 
+# Set download mirror to include iopsys mirror if not specified
+if [ -z "$DOWNLOAD_MIRROR" ]; then
+	export DOWNLOAD_MIRROR="https://download.iopsys.eu/iopsys/mirror/"
+fi
+
 if [ -n "$KEY_BUILD" ]; then
 	echo "$KEY_BUILD" > key-build
 	CONFIG_SIGNED_PACKAGES="y"
