@@ -166,9 +166,9 @@ else
 			exit "$RET"
 		fi
 
-		badhash_msg="HASH does not match "
-		badhash_msg+="|HASH uses deprecated hash,"
-		badhash_msg+="|HASH is missing,"
+		badhash_msg="PKG_HASH does not match "
+		badhash_msg+="|PKG_HASH uses deprecated hash,"
+		badhash_msg+="|PKG_HASH is missing,"
 		if grep -qE "$badhash_msg" logtmp; then
 			echo "Package HASH check failed"
 			exit 1
