@@ -3,6 +3,8 @@ ARG ARCH=mips_24kc
 FROM $CONTAINER:$ARCH
 
 LABEL "com.github.actions.name"="OpenWrt SDK"
+# Update the package list and install jq using opkg
+RUN opkg update && opkg install jq
 
 ADD entrypoint.sh /
 
