@@ -24,14 +24,7 @@ group "bash setup.sh"
 # run setup.sh to download and extract the SDK
 [ ! -f setup.sh ] || bash setup.sh
 endgroup
-group "install extra packages"
-	if command -v jq >/dev/null 2>&1; then
-  		echo "jq command exists."
-	else
-  		echo "jq command does not exist: installing...."
-  		apt-get update && apt-get install -y jq
-	fi
-endgroup
+
 FEEDNAME="${FEEDNAME:-action}"
 BUILD_LOG="${BUILD_LOG:-1}"
 
