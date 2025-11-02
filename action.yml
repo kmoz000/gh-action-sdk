@@ -24,8 +24,8 @@ runs:
       continue-on-error: true
       shell: bash
       run: |
-        echo "Attempting to pull from primary registry: ${{ steps.inputs.outputs.container }}:${ARCH}"
-        docker pull ${{ steps.inputs.outputs.container }}:${ARCH} || exit 1
+        echo "Attempting to pull from primary registry: ${{ steps.inputs.outputs.container }}:${{ env.ARCH }}"
+        docker pull ${{ steps.inputs.outputs.container }}:${{ env.ARCH }} || exit 1
         echo "success=true" >> "$GITHUB_OUTPUT"
     -
       name: Set container registry
@@ -51,8 +51,8 @@ runs:
         build-args: |
           CONTAINER=${{ steps.registry.outputs.container }}
           ARCH
-        cache-to: type=gha,mode=max,scope=${{ steps.registry.outputs.container }}-${{ env.ARCH }}
-        cache-from: type=gha,scope=${{ steps.registry.outputs.container }}-${{ env.ARCH }}
+        cache-to: type=gha,mode=max,scope=sdk-${{ env.ARCH }}
+        cache-from: type=gha,scope=sdk-${{ env.ARCH }}
         load: true
 
     - run: |
