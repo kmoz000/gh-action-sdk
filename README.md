@@ -54,7 +54,9 @@ The action reads a few env variables:
 * `ARTIFACTS_DIR` determines where built packages and build logs are saved.
   Defaults to the default working directory (`GITHUB_WORKSPACE`).
 * `BUILD_LOG` stores build logs in `./logs`.
-* `CONTAINER` can set other SDK containers than `openwrt/sdk`.
+* `CONTAINER` can set other SDK containers than `openwrt/sdk` (Docker Hub).
+  The action will try to pull from Docker Hub first, and fall back to
+  `ghcr.io/openwrt/sdk` (GitHub Container Registry) if the primary fails.
 * `DOWNLOAD_MIRROR` specifies a custom download mirror for packages. Defaults to
   `https://download.iopsys.eu/iopsys/mirror/`.
 * `EXTRA_FEEDS` are added to the `feeds.conf`, where `|` are replaced by white

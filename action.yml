@@ -7,6 +7,7 @@ runs:
     - run: |
         echo "artifacts_dir=${ARTIFACTS_DIR:-$GITHUB_WORKSPACE}" >> "$GITHUB_OUTPUT"
         echo "feed_dir=${FEED_DIR:-$GITHUB_WORKSPACE}" >> "$GITHUB_OUTPUT"
+        echo "container=${CONTAINER:-openwrt/sdk}" >> "$GITHUB_OUTPUT"
       shell: bash
       id: inputs
     - run: sudo chown -R 1000:1000 ${{ steps.inputs.outputs.artifacts_dir }} ${{ steps.inputs.outputs.feed_dir }}
@@ -18,6 +19,27 @@ runs:
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     -
+      name: Try primary registry (Docker Hub)
+      id: try_primary
+      continue-on-error: true
+      shell: bash
+      run: |
+        echo "Attempting to pull from primary registry: ${{ steps.inputs.outputs.container }}:${ARCH}"
+        docker pull ${{ steps.inputs.outputs.container }}:${ARCH} || exit 1
+        echo "success=true" >> "$GITHUB_OUTPUT"
+    -
+      name: Set container registry
+      id: registry
+      shell: bash
+      run: |
+        if [ "${{ steps.try_primary.outputs.success }}" == "true" ]; then
+          echo "Using primary registry (Docker Hub)"
+          echo "container=${{ steps.inputs.outputs.container }}" >> "$GITHUB_OUTPUT"
+        else
+          echo "Primary registry failed, falling back to GitHub Container Registry"
+          echo "container=ghcr.io/openwrt/sdk" >> "$GITHUB_OUTPUT"
+        fi
+    -
       name: Build Docker container image
       uses: docker/build-push-action@v6
       env:
@@ -27,10 +49,10 @@ runs:
         tags: sdk
         context: ${{ github.action_path }}
         build-args: |
-          CONTAINER
+          CONTAINER=${{ steps.registry.outputs.container }}
           ARCH
-        cache-to: type=gha,mode=max,scope=${{ env.CONTAINER }}-${{ env.ARCH }}
-        cache-from: type=gha,scope=${{ env.CONTAINER }}-${{ env.ARCH }}
+        cache-to: type=gha,mode=max,scope=${{ steps.registry.outputs.container }}-${{ env.ARCH }}
+        cache-from: type=gha,scope=${{ steps.registry.outputs.container }}-${{ env.ARCH }}
         load: true
 
     - run: |
