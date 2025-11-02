@@ -25,7 +25,7 @@ runs:
       shell: bash
       run: |
         echo "Attempting to pull from primary registry: ${{ steps.inputs.outputs.container }}:${{ env.ARCH }}"
-        docker pull ${{ steps.inputs.outputs.container }}:${{ env.ARCH }} || exit 1
+        docker pull ${{ steps.inputs.outputs.container }}:${{ env.ARCH }}
         echo "success=true" >> "$GITHUB_OUTPUT"
     -
       name: Set container registry
